@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: text-summarization
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["summarization:8000"]
+        labels:
+          service: text-summarization
+          model: t5-small
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["prometheus:9090"]
