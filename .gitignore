@@ -1,18 +1,10 @@
-# Python
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .venv/
 venv/
-
-# Logs
-logs/*.log
-
-# Model/cache
-models/
-.huggingface/
-
-# Env
 .env
-
-# OS
 .DS_Store
+logs/*.log
+models/
+huggingface/
