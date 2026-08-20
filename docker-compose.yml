@@ -1,32 +1,73 @@
-version: '3.8'
 services:
-  app:
+  summarization:
     build: .
+    container_name: text-summarization
     ports:
       - "8000:8000"
-  prometheus:
-    image: prom/prometheus:latest
+    environment:
+      MODEL_NAME: t5-small
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - hf_cache:/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks: [observability]
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: prometheus
     ports:
       - "9090:9090"
-  loki:
-    image: grafana/loki:latest
     volumes:
-      - ./loki/loki-config.yml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      summarization:
+        condition: service_healthy
+    networks: [observability]
+
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: loki
     ports:
       - "3100:3100"
-  promtail:
-    image: grafana/promtail:latest
+    command: -config.file=/etc/loki/loki-config.yml
     volumes:
-      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
-      - ./logs:/var/log/app
-    command: -config.file=/etc/promtail/config.yml
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki_data:/loki
+    networks: [observability]
+
+  promtail:
+    image: grafana/promtail:3.5.0
+    container_name: promtail
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - ./logs:/var/log/text-summarization:ro
+    depends_on: [loki]
+    networks: [observability]
+
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.0.2
+    container_name: grafana
     ports:
       - "3000:3000"
-    depends_on:
-      - prometheus
-      - loki
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on: [prometheus, loki]
+    networks: [observability]
+
+volumes:
+  hf_cache:
+  grafana_data:
+  loki_data:
+
+networks:
+  observability:
