@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Project 15
+    orgId: 1
+    folder: Text Summarization
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards
