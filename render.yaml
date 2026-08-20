@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: text-summarization-observability
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_NAME
+        value: t5-small
