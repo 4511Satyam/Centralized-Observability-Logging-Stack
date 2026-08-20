@@ -1,0 +1,44 @@
+name: CI - Observability Stack
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install validation dependencies
+        run: pip install pyyaml pytest
+
+      - name: Validate YAML
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          for p in [
+              "prometheus/prometheus.yml",
+              "loki/loki-config.yml",
+              "promtail/promtail-config.yml",
+              "grafana/provisioning/datasources/datasources.yml",
+              "grafana/provisioning/dashboards/dashboards.yml",
+          ]:
+              yaml.safe_load(Path(p).read_text())
+              print("OK:", p)
+          PY
+
+      - name: Validate Docker Compose
+        run: docker compose config -q
+
+      - name: Run tests
+        run: pytest -q
