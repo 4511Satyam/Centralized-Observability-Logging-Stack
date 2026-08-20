@@ -1,0 +1,17 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {"type":"stat","title":"Total Requests (1h)","gridPos":{"h":4,"w":6,"x":0,"y":0},"targets":[{"expr":"increase(summarization_requests_total[1h])","refId":"A"}]},
+    {"type":"stat","title":"Error Rate (5m)","gridPos":{"h":4,"w":6,"x":6,"y":0},"targets":[{"expr":"sum(rate(summarization_requests_total{status=\"error\"}[5m])) / sum(rate(summarization_requests_total[5m])) * 100","refId":"A"}]},
+    {"type":"stat","title":"Average Latency (5m)","gridPos":{"h":4,"w":6,"x":12,"y":0},"targets":[{"expr":"rate(summarization_request_latency_seconds_sum[5m]) / rate(summarization_request_latency_seconds_count[5m])","refId":"A"}]},
+    {"type":"stat","title":"Memory (MB)","gridPos":{"h":4,"w":6,"x":18,"y":0},"targets":[{"expr":"summarization_memory_mb","refId":"A"}]},
+    {"type":"timeseries","title":"Requests by Status","gridPos":{"h":8,"w":12,"x":0,"y":4},"targets":[{"expr":"sum by(status)(rate(summarization_requests_total[5m]))","legendFormat":"{{status}}","refId":"A"}]},
+    {"type":"timeseries","title":"Request Latency","gridPos":{"h":8,"w":12,"x":12,"y":4},"targets":[{"expr":"rate(summarization_request_latency_seconds_sum[5m]) / rate(summarization_request_latency_seconds_count[5m])","legendFormat":"average","refId":"A"}]},
+    {"type":"timeseries","title":"CPU Usage","gridPos":{"h":8,"w":12,"x":0,"y":12},"targets":[{"expr":"summarization_cpu_percent","refId":"A"}]},
+    {"type":"timeseries","title":"Memory Usage","gridPos":{"h":8,"w":12,"x":12,"y":12},"targets":[{"expr":"summarization_memory_mb","refId":"A"}]}
+  ],
+  "schemaVersion": 39,
+  "title": "Text Summarization - Overview",
+  "version": 1
+}
