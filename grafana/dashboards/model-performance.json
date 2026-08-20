@@ -1,0 +1,12 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {"type":"timeseries","title":"Input Token Distribution","gridPos":{"h":8,"w":12,"x":0,"y":0},"targets":[{"expr":"rate(summarization_input_tokens_sum[5m]) / rate(summarization_input_tokens_count[5m])","legendFormat":"avg input tokens","refId":"A"}]},
+    {"type":"timeseries","title":"Output Token Distribution","gridPos":{"h":8,"w":12,"x":12,"y":0},"targets":[{"expr":"rate(summarization_output_tokens_sum[5m]) / rate(summarization_output_tokens_count[5m])","legendFormat":"avg output tokens","refId":"A"}]},
+    {"type":"timeseries","title":"p95 Latency","gridPos":{"h":8,"w":24,"x":0,"y":8},"targets":[{"expr":"histogram_quantile(0.95, sum(rate(summarization_request_latency_seconds_bucket[5m])) by (le))","legendFormat":"p95","refId":"A"}]}
+  ],
+  "schemaVersion": 39,
+  "title": "Text Summarization - Model Performance",
+  "version": 1
+}
