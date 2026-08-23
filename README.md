@@ -69,7 +69,7 @@ Grafana login:
 
 ```text
 username: admin
-password: admin
+password: satyam4511
 ```
 
 The first model startup downloads `t5-small`, so the first run may take longer.
